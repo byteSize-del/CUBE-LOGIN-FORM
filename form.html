@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Cube Login Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .cube-container {
+            perspective: 1200px;
+            width: 360px;
+            height: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cube {
+            width: 320px;
+            height: 320px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform: rotateY(0deg);
+        }
+
+        .cube.show-password {
+            transform: rotateY(-90deg);
+        }
+
+        .cube.show-success {
+            transform: rotateY(-180deg);
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            background: rgba(35, 38, 58, 0.95);
+            border: 1px solid rgba(127, 83, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            color: #fff;
+            backface-visibility: hidden;
+        }
+
+        /* Layered Content Animation Setup */
+        .cube-face h2,
+        .cube-face input,
+        .cube-face button,
+        .cube-face .button-row,
+        .cube-face .success-content {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.6s ease;
+        }
+
+        /* Face 1: Email - Slide Up Animation (Initial Hidden State) */
+        .cube-face.front h2 {
+            transform: translateY(40px);
+            opacity: 0;
+        }
+
+        .cube-face.front input {
+            transform: translateY(50px);
+            opacity: 0;
+            transition-delay: 0.1s;
+        }
+
+        .cube-face.front button {
+            transform: translateY(60px);
+            opacity: 0;
+            transition-delay: 0.2s;
+        }
+
+        /* Face 1: Active State - Slide Up to Position */
+        .cube-face.front.is-active h2 {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .cube-face.front.is-active input {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .cube-face.front.is-active button {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Face 2: Password - Slide Left Animation (Initial Hidden State) */
+        .cube-face.right h2 {
+            transform: translateX(60px);
+            opacity: 0;
+        }
+
+        .cube-face.right input {
+            transform: translateX(70px);
+            opacity: 0;
+            transition-delay: 0.1s;
+        }
+
+        .cube-face.right .button-row {
+            transform: translateX(80px);
+            opacity: 0;
+            transition-delay: 0.2s;
+        }
+
+        /* Face 2: Active State - Slide Left to Position */
+        .cube-face.right.is-active h2 {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .cube-face.right.is-active input {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .cube-face.right.is-active .button-row {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Face 3: Success - Pop In Animation (Initial Hidden State) */
+        .cube-face.back .success-content {
+            transform: scale(0.7);
+            opacity: 0;
+        }
+
+        .cube-face.back .success-icon {
+            transform: scale(0.5);
+            opacity: 0;
+            transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55),
+                opacity 0.5s ease;
+        }
+
+        /* Face 3: Active State - Pop In to Position */
+        .cube-face.back.is-active .success-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .cube-face.back.is-active .success-icon {
+            transform: scale(1);
+            opacity: 1;
+            transition-delay: 0.2s;
+        }
+
+        .cube-face h2 {
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            background: linear-gradient(90deg, #7f53ff, #3a5eff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cube-face input {
+            width: 100%;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(127, 83, 255, 0.3);
+            background: rgba(24, 26, 32, 0.8);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .cube-face input:focus {
+            border-color: #7f53ff;
+            box-shadow: 0 0 15px rgba(127, 83, 255, 0.4);
+        }
+
+        .cube-face input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .cube-face button {
+            background: linear-gradient(90deg, #7f53ff, #3a5eff);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(127, 83, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cube-face.is-active button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(127, 83, 255, 0.5);
+        }
+
+        .cube-face.is-active button:active {
+            transform: translateY(0) !important;
+        }
+
+        .back-btn {
+            background: transparent !important;
+            border: 2px solid #7f53ff !important;
+            padding: 10px 24px !important;
+            font-size: 0.95rem !important;
+            margin-right: auto;
+            box-shadow: none !important;
+        }
+
+        .back-btn:hover {
+            background: rgba(127, 83, 255, 0.1) !important;
+            transform: translateY(-2px);
+        }
+
+        .button-row {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* 3D Face Positioning */
+        .cube-face.front {
+            transform: rotateY(0deg) translateZ(160px);
+        }
+
+        .cube-face.right {
+            transform: rotateY(90deg) translateZ(160px);
+        }
+
+        .cube-face.back {
+            transform: rotateY(180deg) translateZ(160px);
+        }
+
+        /* Success Face Styling */
+        .success-content {
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            animation: successPulse 1.5s ease-in-out infinite;
+        }
+
+        .success-icon::before {
+            content: "✓";
+            font-size: 3.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes successPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 40px rgba(0, 255, 136, 0.5);
+            }
+        }
+
+        .success-content h2 {
+            margin-bottom: 15px;
+        }
+
+        .success-content p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .cube-container {
+                width: 95vw;
+                height: 95vw;
+                max-width: 360px;
+                max-height: 360px;
+            }
+
+            .cube {
+                width: 90vw;
+                height: 90vw;
+                max-width: 320px;
+                max-height: 320px;
+            }
+
+            .cube-face {
+                width: 90vw;
+                height: 90vw;
+                max-width: 320px;
+                max-height: 320px;
+                padding: 30px 20px;
+            }
+
+            .cube-face h2 {
+                font-size: 1.8rem;
+                margin-bottom: 25px;
+            }
+
+            .cube-face input {
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .cube-face button {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+
+            .success-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .success-icon::before {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .cube-face h2 {
+                font-size: 1.5rem;
+            }
+
+            .cube-face {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cube-container">
+        <div class="cube" id="cube">
+            <!-- Face 1: Email -->
+            <div class="cube-face front">
+                <h2>Login</h2>
+                <input type="email" id="email" placeholder="Enter your email" autocomplete="username" required>
+                <button id="nextBtn">Next</button>
+            </div>
+
+            <!-- Face 2: Password -->
+            <div class="cube-face right">
+                <h2>Password</h2>
+                <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password"
+                    required>
+                <div class="button-row">
+                    <button class="back-btn" id="backBtn">← Back</button>
+                    <button id="submitBtn">Submit</button>
+                </div>
+            </div>
+
+            <!-- Face 3: Success -->
+            <div class="cube-face back">
+                <div class="success-content">
+                    <div class="success-icon"></div>
+                    <h2>Login Successful!</h2>
+                    <p>Welcome back! You have been successfully logged in.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const cube = document.getElementById('cube');
+        const nextBtn = document.getElementById('nextBtn');
+        const backBtn = document.getElementById('backBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        const emailFace = document.querySelector('.cube-face.front');
+        const passwordFace = document.querySelector('.cube-face.right');
+        const successFace = document.querySelector('.cube-face.back');
+
+        // Rotation state tracker
+        let currentState = 0; // 0: email, 1: password, 2: success
+
+        // Function to rotate cube to specific state
+        function rotateCube(state) {
+            // Remove is-active from current face to hide its content
+            if (currentState === 0) emailFace.classList.remove('is-active');
+            if (currentState === 1) passwordFace.classList.remove('is-active');
+            if (currentState === 2) successFace.classList.remove('is-active');
+
+            // Remove all rotation state classes
+            cube.classList.remove('show-password', 'show-success');
+
+            // Add appropriate rotation class based on state
+            if (state === 1) {
+                cube.classList.add('show-password');
+                // Wait for cube rotation to complete (800ms), then animate content
+                setTimeout(() => {
+                    passwordFace.classList.add('is-active');
+                    passwordInput.focus();
+                }, 800);
+            } else if (state === 2) {
+                cube.classList.add('show-success');
+                // Wait for cube rotation to complete, then animate success content
+                setTimeout(() => {
+                    successFace.classList.add('is-active');
+                }, 800);
+            } else {
+                // Rotating back to email face
+                setTimeout(() => {
+                    emailFace.classList.add('is-active');
+                    emailInput.focus();
+                }, 800);
+            }
+
+            currentState = state;
+        }
+
+        // Trigger email face animation on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                emailFace.classList.add('is-active');
+                emailInput.focus();
+            }, 200);
+        });
+
+        // Next button - Email to Password
+        nextBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+
+            // Simple validation
+            if (!email) {
+                emailInput.focus();
+                emailInput.style.borderColor = '#ff4444';
+                setTimeout(() => {
+                    emailInput.style.borderColor = 'rgba(127, 83, 255, 0.3)';
+                }, 1000);
+                return;
+            }
+
+            // Basic email format check
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailInput.focus();
+                emailInput.style.borderColor = '#ff4444';
+                setTimeout(() => {
+                    emailInput.style.borderColor = 'rgba(127, 83, 255, 0.3)';
+                }, 1000);
+                return;
+            }
+
+            rotateCube(1);
+        });
+
+        // Back button - Password to Email
+        backBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            rotateCube(0);
+        });
+
+        // Submit button - Password to Success
+        submitBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const password = passwordInput.value.trim();
+
+            // Simple validation
+            if (!password) {
+                passwordInput.focus();
+                passwordInput.style.borderColor = '#ff4444';
+                setTimeout(() => {
+                    passwordInput.style.borderColor = 'rgba(127, 83, 255, 0.3)';
+                }, 1000);
+                return;
+            }
+
+            // Minimum password length check
+            if (password.length < 6) {
+                passwordInput.focus();
+                passwordInput.style.borderColor = '#ff4444';
+                setTimeout(() => {
+                    passwordInput.style.borderColor = 'rgba(127, 83, 255, 0.3)';
+                }, 1000);
+                return;
+            }
+
+            rotateCube(2);
+
+            // Here you would typically send data to server
+            console.log('Login attempt with:', {
+                email: emailInput.value,
+                password: '***hidden***'
+            });
+        });
+
+        // Allow Enter key to trigger next/submit
+        emailInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                nextBtn.click();
+            }
+        });
+
+        passwordInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+    </script>
+</body>
+
+</html>
