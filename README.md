@@ -4,7 +4,7 @@ This project features a visually engaging 3D cube login form built with HTML, CS
 
 ## Demo
 
-![Cube Login Demo](Screenshot 2025-10-05 210714.png)
+![Cube Login Demo](Screenshot.png)
 *(Add your demo GIF or screenshot here)*
 
 ## Features
